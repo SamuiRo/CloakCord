@@ -2,10 +2,13 @@
 Discord bot to track other servers
 
 # First launch
-```npm i```
-```node init``` then fill src > configs > guild_whitelist.json with data
-also you need to fill .env (will be create automaticaly)
-Launch ```node index``` 
+  ```npm i```
+
+  ```node init``` then fill src > configs > guild_whitelist.json with data
+
+  also you need to fill .env (will be create automaticaly)
+
+  Launch ```node index``` 
 
 # Get Token ?
 Run code (Discord Console - [Ctrl + Shift + I])
