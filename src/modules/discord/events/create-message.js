@@ -16,7 +16,9 @@ async function on_message_create(message) {
 
         if (!contentIncludesKeywords) return // Якщо повідомлення не містить жодного ключового слова, ігноруємо його
 
-        console.log("contentIncludesKeywords", contentIncludesKeywords)
+        let sanitized_content = message.content
+            .replace(/@here/g, 'here')
+            .replace(/@everyone/g, 'everyone');
 
         const webhook_urls = {
             Arcade: DISCORD_ARCADE_CHANNEL_WEBHOOK,
@@ -27,8 +29,7 @@ async function on_message_create(message) {
         let webhook_url = webhook_urls[channelFilter.type];
 
         post = "## 〓 " + channelFilter.guild_name + "\n" +
-            message.content
-
+            sanitized_content
 
         console.log('Message passed the filter:', post)
 
