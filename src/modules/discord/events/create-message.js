@@ -20,6 +20,10 @@ async function on_message_create(message) {
             .replace(/@here/g, 'here')
             .replace(/@everyone/g, 'everyone');
 
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+        sanitized_content = sanitized_content.replace(urlRegex, '<$1>');
+
         const webhook_urls = {
             Arcade: DISCORD_ARCADE_CHANNEL_WEBHOOK,
             Treasure: DISCORD_TREASURE_CHANNEL_WEBHOOK,
