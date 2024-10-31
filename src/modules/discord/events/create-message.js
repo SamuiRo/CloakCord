@@ -27,6 +27,8 @@ async function on_message_create(message) {
         const webhook_urls = {
             Arcade: DISCORD_ARCADE_CHANNEL_WEBHOOK,
             Treasure: DISCORD_TREASURE_CHANNEL_WEBHOOK,
+            Lunar: DISCORD_LUNAR_CHANNEL_WEBHOOK,
+            Sakura: DISCORD_SAKURA_CHANNEL_WEBHOOK,
             Test: DISCORD_TEST_CHANNEL_WEBHOOK,
         }
 
