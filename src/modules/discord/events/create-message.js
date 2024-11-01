@@ -1,7 +1,7 @@
 const { webhookService } = require("../services/index")
 const filters = require("../../../configs/guild_whitelist.json")
 
-const { DISCORD_TREASURE_CHANNEL_WEBHOOK, DISCORD_ARCADE_CHANNEL_WEBHOOK, DISCORD_TEST_CHANNEL_WEBHOOK } = require("../../../configs/app.config")
+const { DISCORD_TREASURE_CHANNEL_WEBHOOK, DISCORD_ARCADE_CHANNEL_WEBHOOK, DISCORD_TEST_CHANNEL_WEBHOOK, DISCORD_LUNAR_CHANNEL_WEBHOOK, DISCORD_SAKURA_CHANNEL_WEBHOOK } = require("../../../configs/app.config")
 
 async function on_message_create(message) {
     let post = ""
