@@ -16,6 +16,7 @@ async function init() {
                 "target_discord": ["Discrod channel id"],
                 "target_telegram": ["Telegram channel id"],
                 "filter": ["key", "words"],
+                "suppress_embed": true,
                 "type": "Arcade"
             }
         }
