@@ -1,6 +1,7 @@
 const { Client } = require('discord.js-selfbot-v13');
 
 const { on_message_create } = require("./events/index")
+const { notify } = require("../../shared/notification")
 
 const { DISCORD_TOKEN } = require("../../configs/app.config")
 const { READY, MESSAGE_CREATE } = require("./enums/index")
@@ -16,11 +17,13 @@ async function login() {
 
             client.once(READY, async () => {
                 console.log(`${client.user.username} is ready!`);
+                notify("Client " + client.user.username + " is ready!")
                 resolve()
             });
 
         } catch (error) {
             console.log(error)
+            notify("Login " + error.message)
             reject()
         }
     })
@@ -34,6 +37,7 @@ async function add_events() {
         console.log("Events added")
     } catch (error) {
         console.log(error)
+        notify("Add_Events " + error.message)
     }
 }
 
@@ -44,6 +48,7 @@ async function launch() {
         await add_events()
     } catch (error) {
         console.log(error)
+        notify("Launch " + error.message)
     }
 }
 
