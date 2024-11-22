@@ -4,7 +4,7 @@ const filters = require("../../../configs/guild_whitelist.json")
 const { DISCORD_TREASURE_CHANNEL_WEBHOOK, DISCORD_ARCADE_CHANNEL_WEBHOOK, DISCORD_TEST_CHANNEL_WEBHOOK, DISCORD_LUNAR_CHANNEL_WEBHOOK, DISCORD_SAKURA_CHANNEL_WEBHOOK } = require("../../../configs/app.config")
 
 async function on_message_create(message) {
-    let post = ""
+    let post = {}
     try {
         const channelFilter = filters[message.channelId];
         if (!channelFilter) return // Якщо фільтра для цього channelId не існує, просто виходимо
@@ -35,10 +35,24 @@ async function on_message_create(message) {
 
         let webhook_url = webhook_urls[channelFilter.type];
 
-        post = "## 〓 " + channelFilter.guild_name + "\n" +
-            sanitized_content
+        post = {
+            content: `## 〓 ${channelFilter.guild_name}\n${sanitized_content}`,
+            // files: [] // Список файлів
+            embeds: []
+        };
 
-        console.log('Message passed the filter:', post)
+        if (message.attachments?.size > 0) {
+            message.attachments.forEach(attachment => {
+                if (attachment.contentType?.startsWith('image/')) {
+                    post.embeds.push({
+                        title: attachment.tittle,
+                        image: { url: attachment.url }
+                    });
+                } else {
+                    console.log(`Unsupported attachment type: ${attachment.contentType}`);
+                }
+            });
+        }
 
         await webhookService.send_webhook_message(webhook_url, post)
     } catch (error) {

@@ -6,15 +6,11 @@ const axios = require("axios")
  * @param {string} message - Повідомлення для надсилання.
  * @returns {Promise<void>}
  */
-async function send_webhook_message(webhookUrl, message) {
+async function send_webhook_message(webhook_url, payload) {
     try {
-        const response = await axios.post(webhookUrl, {
-            content: message
-        });
+        const response = await axios.post(webhook_url, payload);
 
-        if (response.status === 204) {
-            console.log('Повідомлення успішно надіслано.');
-        }
+        console.log("RESPONSE STATUS: ", response.status)
     } catch (error) {
         console.error('Помилка при надсиланні повідомлення:', error.response ? error.response.data : error.message);
     }

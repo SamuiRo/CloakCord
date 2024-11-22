@@ -32,4 +32,6 @@ const filters = [
     "receive",
     "ambassador",
     "role holder",
+    "claim live",
+    
 ]
