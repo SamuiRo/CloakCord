@@ -33,5 +33,12 @@ const filters = [
     "ambassador",
     "role holder",
     "claim live",
-    
+    "update",
+    "node update",
+    "promo",
+    "code",
+    "promocode",
+    "allocation",
+    "guide",
+    "farm"
 ]

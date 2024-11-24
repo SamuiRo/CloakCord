@@ -6,7 +6,9 @@ const axios = require("axios")
  * @param {string} message - Повідомлення для надсилання.
  * @returns {Promise<void>}
  */
-async function send_webhook_message(webhook_url, payload) {
+async function send_webhook_message(webhook, payload) {
+    let webhook_url = "https://discord.com/api/webhooks/" + webhook
+
     try {
         const response = await axios.post(webhook_url, payload);
 

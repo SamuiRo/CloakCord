@@ -1,12 +1,11 @@
 const { webhookService } = require("../services/index")
 const filters = require("../../../configs/guild_whitelist.json")
-
-const { DISCORD_TREASURE_CHANNEL_WEBHOOK, DISCORD_ARCADE_CHANNEL_WEBHOOK, DISCORD_TEST_CHANNEL_WEBHOOK, DISCORD_LUNAR_CHANNEL_WEBHOOK, DISCORD_SAKURA_CHANNEL_WEBHOOK } = require("../../../configs/app.config")
+const { Channel } = require("../../pot/models/index")
 
 async function on_message_create(message) {
     let post = {}
     try {
-        const channelFilter = filters[message.channelId];
+        const channelFilter = await Channel.findOne({ where: { channelId: message.channelId } })
         if (!channelFilter) return // Якщо фільтра для цього channelId не існує, просто виходимо
 
         const keywords = channelFilter.filter;
@@ -24,16 +23,6 @@ async function on_message_create(message) {
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             sanitized_content = sanitized_content.replace(urlRegex, '<$1>');
         }
-
-        const webhook_urls = {
-            Arcade: DISCORD_ARCADE_CHANNEL_WEBHOOK,
-            Treasure: DISCORD_TREASURE_CHANNEL_WEBHOOK,
-            Lunar: DISCORD_LUNAR_CHANNEL_WEBHOOK,
-            Sakura: DISCORD_SAKURA_CHANNEL_WEBHOOK,
-            Test: DISCORD_TEST_CHANNEL_WEBHOOK,
-        }
-
-        let webhook_url = webhook_urls[channelFilter.type];
 
         post = {
             content: `## 〓 ${channelFilter.guild_name}\n${sanitized_content}`,
@@ -54,7 +43,10 @@ async function on_message_create(message) {
             });
         }
 
-        await webhookService.send_webhook_message(webhook_url, post)
+        for (const discord_webhook_url of channelFilter.target_discord) {
+            await webhookService.send_webhook_message(discord_webhook_url, post)
+        }
+
     } catch (error) {
         console.log(error)
     }

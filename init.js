@@ -8,6 +8,7 @@ async function init() {
         await notify("Start CloakCord Initializing...")
         const guild_whitelist_path = path.join(process.cwd(), "src", "configs", "guild_whitelist.json")
         const dotenv_path = path.join(process.cwd(), ".env")
+        const sqlite_db_path = path.join(process.cwd(), "pot.sqlite")
 
         let data = {
             "<channelId>": {
@@ -21,12 +22,12 @@ async function init() {
             }
         }
 
-        let dotenv_data = 'DISCORD_TOKEN = ""\n' +
+        let dotenv_data = 'DISCORD_TOKEN = ""\n\n' +
             'DISCORD_TREASURE_CHANNEL_WEBHOOK = ""\n' +
             'DISCORD_ARCADE_CHANNEL_WEBHOOK = ""\n' +
             'DISCORD_TEST_CHANNEL_WEBHOOK = ""\n' +
             'DISCORD_LUNAR_CHANNEL_WEBHOOK = ""\n' +
-            'DISCORD_SAKURA_CHANNEL_WEBHOOK = ""\n' +
+            'DISCORD_SAKURA_CHANNEL_WEBHOOK = ""\n\n' +
             'TELEGRAM_BOT_TOKEN = ""\n' +
             'TELEGRAM_CHANNEL_ID = ""\n' +
             'TELEGRAM_FORUM_ID = ""\n'

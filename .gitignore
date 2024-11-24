@@ -1,4 +1,6 @@
 /src/configs/guild_whitelist.json
+*.sqlite
+
 
 # Logs
 logs

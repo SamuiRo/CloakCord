@@ -1,16 +1,31 @@
 # CloakCord
+
 Discord bot to track other servers
 
-# First launch
-  ```npm i```
+## First launch
 
-  ```node init``` then fill src > configs > guild_whitelist.json with data
+```java
+npm i
+```
+
+```java
+node init
+```
+
+then fill src > configs > guild_whitelist.json with data
 
   also you need to fill .env (will be create automaticaly)
 
-  Launch ```node index``` 
+  ```java
+node upload
+```
 
-# Get Token ?
+To upload data from **guild_whitelist.json** into **Dataabe**
+
+  Launch ```node index```
+
+## Get Token ?
+
 Run code (Discord Console - [Ctrl + Shift + I])
 
 IF it's first time console using type ```allow pasting``` and press ENTER
