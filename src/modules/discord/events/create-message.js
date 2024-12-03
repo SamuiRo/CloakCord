@@ -1,5 +1,4 @@
 const { webhookService } = require("../services/index")
-const filters = require("../../../configs/guild_whitelist.json")
 const { Channel } = require("../../pot/models/index")
 
 async function on_message_create(message) {

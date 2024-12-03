@@ -40,5 +40,6 @@ const filters = [
     "promocode",
     "allocation",
     "guide",
-    "farm"
+    "farm",
+    "Release"
 ]
