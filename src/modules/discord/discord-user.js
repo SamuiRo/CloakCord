@@ -20,15 +20,15 @@ const client_options = {
             lifetime: 1800,
         },
         // Очищення кешу користувачів через 24 години
-        users: {
-            interval: 1800,
-            lifetime: 1800,
-        },
+        // users: {
+        //     interval: 1800,
+        //     lifetime: 1800,
+        // },
         // Очищення кешу емодзі через 6 годин
-        emojis: {
-            interval: 1800,
-            lifetime: 1800,
-        },
+        // emojis: {
+        //     interval: 1800,
+        //     lifetime: 1800,
+        // },
         // Очищення кешу гільдій через 12 годин
         guilds: {
             interval: 1800,
