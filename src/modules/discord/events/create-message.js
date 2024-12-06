@@ -2,7 +2,6 @@ const { webhookService } = require("../services/index")
 const { Channel } = require("../../pot/models/index")
 
 async function on_message_create(message) {
-    let post = {}
     try {
         const channelFilter = await Channel.findOne({ where: { channelId: message.channelId } })
         if (!channelFilter) return // Якщо фільтра для цього channelId не існує, просто виходимо
@@ -23,7 +22,7 @@ async function on_message_create(message) {
             sanitized_content = sanitized_content.replace(urlRegex, '<$1>');
         }
 
-        post = {
+        let post = {
             content: `## 〓 ${channelFilter.guild_name}\n${sanitized_content}`,
             // files: [] // Список файлів
             embeds: []
@@ -46,6 +45,7 @@ async function on_message_create(message) {
             await webhookService.send_webhook_message(discord_webhook_url, post)
         }
 
+        post = null
     } catch (error) {
         console.log(error)
     }

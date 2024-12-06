@@ -35,11 +35,19 @@ function getResourceUsage() {
     }
 }
 
+
+
 function createHeapSnapshot() {
     const snapshotPath = path.join(__dirname, `heap-${Date.now()}.heapsnapshot`);
-    v8.writeHeapSnapshot(snapshotPath);
-    console.log(`Heap snapshot saved to: ${snapshotPath}`);
-    return snapshotPath;
+    try {
+        v8.writeHeapSnapshot(snapshotPath);
+        console.log(`Heap snapshot saved to: ${snapshotPath}`);
+
+        return snapshotPath;
+    } catch (error) {
+        console.error('Error writing heap snapshot:', error);
+        return snapshotPath;
+    }
 }
 
 async function checkMemoryLeaks() {
@@ -48,8 +56,8 @@ async function checkMemoryLeaks() {
         if (memoryUsage.heapUsed > memoryUsage.heapTotal * 0.8) {
             console.warn('Warning: Possible memory leak detected!');
 
-            const snapshotPath = createHeapSnapshot();
-            await notify(`Warning: Possible memory leak detected!\nHeap snapshot generated at: ${snapshotPath}`);
+            // const snapshotPath = createHeapSnapshot();
+            // await notify(`Warning: Possible memory leak detected!\nHeap snapshot generated at: ${snapshotPath}`);
         }
     } catch (error) {
         console.log(error);

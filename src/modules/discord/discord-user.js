@@ -6,9 +6,38 @@ const { notify } = require("../../shared/notification")
 const { DISCORD_TOKEN } = require("../../configs/app.config")
 const { READY, MESSAGE_CREATE } = require("./enums/index")
 
-const client = new Client({
+const client_options = {
     checkUpdate: true,
-});
+    sweepers: {
+        // Очищення кешу для повідомлень через 30 хвилин
+        messages: {
+            interval: 1800, // інтервал очищення (секунди)
+            lifetime: 1800, // час життя повідомлення в кеші (секунди)
+        },
+        // Очищення кешу каналів через 60 хвилин
+        channels: {
+            interval: 1800,
+            lifetime: 1800,
+        },
+        // Очищення кешу користувачів через 24 години
+        users: {
+            interval: 1800,
+            lifetime: 1800,
+        },
+        // Очищення кешу емодзі через 6 годин
+        emojis: {
+            interval: 1800,
+            lifetime: 1800,
+        },
+        // Очищення кешу гільдій через 12 годин
+        guilds: {
+            interval: 1800,
+            lifetime: 1800,
+        },
+    },
+}
+
+const client = new Client(client_options);
 
 async function login() {
     return new Promise((resolve, reject) => {
@@ -32,7 +61,10 @@ async function login() {
 
 async function add_events() {
     try {
-        client.on(MESSAGE_CREATE, on_message_create);
+        if (!client.listenerCount(MESSAGE_CREATE)) {
+            client.on(MESSAGE_CREATE, on_message_create);
+        }
+        // client.on(MESSAGE_CREATE, on_message_create);
 
         console.log("Events added")
     } catch (error) {
