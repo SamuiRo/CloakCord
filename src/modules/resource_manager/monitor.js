@@ -69,7 +69,7 @@ async function sendReport() {
         const usage = getResourceUsage();
         const report = `
 Resource Usage Report:
-===========================
+===========================🟢🟢🟢
 Total Memory: ${usage.totalMemory}
 Used Memory: ${usage.usedMemory}
 Free Memory: ${usage.freeMemory}

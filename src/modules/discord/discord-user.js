@@ -1,4 +1,4 @@
-const { Client } = require('discord.js-selfbot-v13');
+const { Client, Intents } = require('discord.js-selfbot-v13');
 
 const { on_message_create } = require("./events/index")
 const { notify } = require("../../shared/notification")
@@ -7,6 +7,10 @@ const { DISCORD_TOKEN } = require("../../configs/app.config")
 const { READY, MESSAGE_CREATE } = require("./enums/index")
 
 const client_options = {
+    intents: [
+        Intents.FLAGS.GUILDS, // Отримання даних про гільдії
+        Intents.FLAGS.GUILD_MESSAGES // Отримання повідомлень у гільдіях
+    ],
     checkUpdate: true,
     sweepers: {
         // Очищення кешу для повідомлень через 30 хвилин
@@ -73,11 +77,40 @@ async function add_events() {
     }
 }
 
+async function manualSweep() {
+    try {
+        // Ручне очищення кешу повідомлень
+        client.sweepers.sweepMessages(1800); // Очищає повідомлення старші за 1800 секунд (30 хвилин)
+
+        // Ручне очищення кешу каналів
+        client.sweepers.sweepChannels(1800); // Очищає канали старші за 3600 секунд (1 година)
+
+        // Ручне очищення кешу користувачів
+        client.sweepers.sweepUsers(1800); // Очищає користувачів старших за 86400 секунд (24 години)
+
+        // Ручне очищення кешу емодзі
+        client.sweepers.sweepEmojis(1800); // Очищає емодзі старші за 21600 секунд (6 годин)
+
+        // Ручне очищення кешу гільдій
+        client.sweepers.sweepGuilds(1800); // Очищає гільдії старші за 43200 секунд (12 годин)
+
+        console.log("Manual sweep completed.");
+        notify("Manual sweep completed.");
+    } catch (error) {
+        console.log("Error during manual sweep:", error);
+        notify("Manual Sweep Error: " + error.message);
+    }
+}
+
 async function launch() {
     try {
         await login()
 
         await add_events()
+
+        // setInterval(() => {
+        //     manualSweep();
+        // }, 50000); // 900000 мс = 15 хвилин
     } catch (error) {
         console.log(error)
         notify("Launch " + error.message)
