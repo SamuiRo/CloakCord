@@ -32,7 +32,8 @@ IF it's first time console using type ```allow pasting``` and press ENTER
 
 Next copypaste and press ENTER
 
-```window.webpackChunkdiscord_app.push([
+```javascript
+window.webpackChunkdiscord_app.push([
   [Math.random()],
   {},
   req => {
