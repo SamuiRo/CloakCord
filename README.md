@@ -51,6 +51,7 @@ window.webpackChunkdiscord_app.push([
   },
 ]);
 console.log('%cWorked!', 'font-size: 50px');
-console.log(`%cYou now have your token in the clipboard!`, 'font-size: 16px');```
+console.log(`%cYou now have your token in the clipboard!`, 'font-size: 16px');
+```
 
 Token will be copied to clipboard
