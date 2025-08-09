@@ -5,7 +5,7 @@ const { notify } = require("./src/shared/notification")
 
 async function init() {
     try {
-        await notify("Start CloakCord Initializing...")
+        // await notify("Start CloakCord Initializing...")
         const guild_whitelist_path = path.join(process.cwd(), "src", "configs", "guild_whitelist.json")
         const dotenv_path = path.join(process.cwd(), ".env")
         const sqlite_db_path = path.join(process.cwd(), "pot.sqlite")
@@ -38,7 +38,7 @@ async function init() {
         console.log("Pls fill " + guild_whitelist_path + " with data")
         console.log("Pls fill " + dotenv_path + " with enviroment variables")
 
-        await notify("CloakCord init complete")
+        // await notify("CloakCord init complete")
     } catch (error) {
         console.log(error)
     }

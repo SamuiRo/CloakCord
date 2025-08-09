@@ -1,5 +1,15 @@
-const { on_message_create } = require("./create-message")
+const {
+  on_message_create,
+  getStats,
+  cleanupCache,
+  emergencyCleanup,
+  getDetailedDiagnostics,
+} = require("./create-message");
 
 module.exports = {
-    on_message_create
-}
+  on_message_create,
+  getStats,
+  cleanupCache,
+  emergencyCleanup,
+  getDetailedDiagnostics,
+};
