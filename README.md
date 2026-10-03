@@ -24,6 +24,13 @@ To upload data from **guild_whitelist.json** into **Dataabe**
 
   Launch ```node index```
 
+## Memory
+
+Memory growth was caused by unbounded member and user caches in the library
+(it forces all intents for user accounts). Fixed in v1.6.1 with cache limits.
+Investigation, fix and verification procedure: [docs/MEMORY.md](docs/MEMORY.md).
+The monitor logs a `[MEMSTAT]` line every 10 minutes.
+
 ## Get Token ?
 
 Run code (Discord Console - [Ctrl + Shift + I])
