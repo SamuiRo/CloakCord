@@ -1,20 +1,22 @@
 const axios = require("axios")
 
+const WEBHOOK_BASE = "https://discord.com/api/webhooks/"
+
 /**
- * Функція для надсилання повідомлення на Discord Webhook.
- * @param {string} webhookUrl - URL твого Discord Webhook.
- * @param {string} message - Повідомлення для надсилання.
- * @returns {Promise<void>}
+ * Надсилає повідомлення на Discord Webhook.
+ * @param {string} webhook - "id/token" (так зберігається в БД) або повний URL.
+ * @param {object} payload - тіло повідомлення (content, embeds).
+ * @returns {Promise<void>} Кидає помилку, якщо Discord не прийняв повідомлення.
  */
 async function send_webhook_message(webhook, payload) {
-    let webhook_url = "https://discord.com/api/webhooks/" + webhook
+    const webhook_url = webhook.startsWith("https://") ? webhook : WEBHOOK_BASE + webhook
 
     try {
-        const response = await axios.post(webhook_url, payload);
-
-        console.log("RESPONSE STATUS: ", response.status)
+        await axios.post(webhook_url, payload, { timeout: 15000 })
     } catch (error) {
-        console.error('Помилка при надсиланні повідомлення:', error.response ? error.response.data : error.message);
+        // URL містить токен webhook-а, тому в помилку йде лише статус і тіло відповіді
+        const details = error.response ? `${error.response.status} ${JSON.stringify(error.response.data)}` : error.message
+        throw new Error(details)
     }
 }
 

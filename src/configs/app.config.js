@@ -12,4 +12,6 @@ module.exports = {
     TELEGRAM_CHANNEL_ID: process.env.TELEGRAM_CHANNEL_ID,
     TELEGRAM_FORUM_ID: process.env.TELEGRAM_FORUM_ID,
 
+    // Поріг RSS (МБ), вище якого монітор шле тривогу в Telegram (не частіше разу на годину)
+    MEMORY_ALERT_MB: Number(process.env.MEMORY_ALERT_MB) || 400,
 }
