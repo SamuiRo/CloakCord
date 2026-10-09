@@ -2,6 +2,12 @@
 
 Discord bot to track other servers
 
+> **Moved into Inemuri (2026-10-09, Inemuri v4.61.0).** This service is
+> switched off and no longer maintained. The reader lives on as Inemuri's
+> Discord source (`platform: "discord"`, `src/sources/discord/`,
+> `docs/DISCORD_SOURCE.md` there). This repository keeps its history and the
+> memory investigation ([docs/MEMORY.md](docs/MEMORY.md)).
+
 ## First launch
 
 ```java
@@ -34,8 +40,9 @@ The monitor logs a `[MEMSTAT]` line every 10 minutes.
 ## Status and plan
 
 - [docs/ISSUES.md](docs/ISSUES.md) — every known problem, fixed and open.
-- [docs/NEXT_STEPS.md](docs/NEXT_STEPS.md) — moving into Inemuri as a source,
-  then replacing the archived library with an own minimal client.
+- [docs/NEXT_STEPS.md](docs/NEXT_STEPS.md) — moving into Inemuri as a source
+  (step 2, done), then replacing the archived library with an own minimal
+  client (step 3, open).
 
 ## Get Token ?
 

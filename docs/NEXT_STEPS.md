@@ -4,6 +4,16 @@ Plan agreed on 2026-10-08. CloakCord becomes a source of Inemuri (a Discord
 user-account reader), and the dead library is replaced by an own minimal
 client. Known problems are in [ISSUES.md](ISSUES.md).
 
+| Step | Status |
+|---|---|
+| 1 — verify 1.6.3 | Closed without a forwarding check: the leak fix was confirmed (19 h flat RSS), forwarding was not; the operator moved on to step 2 |
+| 2 — move into Inemuri on the library | **Done 2026-10-09, Inemuri v4.61.0.** Not yet run against Discord. CloakCord is switched off |
+| 3 — own minimal client | Open — lives in Inemuri now (its `docs/DISCORD_SOURCE.md`, "Next") |
+
+From step 2 on, the source is maintained in Inemuri: `src/sources/discord/`
+and `docs/DISCORD_SOURCE.md` there. This repository is kept for its history
+and its memory investigation, not run.
+
 What CloakCord actually needs from Discord is small:
 
 1. **Live events:** receive `MESSAGE_CREATE` from a set of channels.
@@ -27,9 +37,33 @@ management, captcha, TOTP, remote auth, a full object cache) is unused.
 - Clean the channel list of rows the account can no longer see.
 - Exit criterion: `sent` grows with `matched` on real traffic, RSS flat.
 
-## Step 2 — move into Inemuri on the current library
+## Step 2 — move into Inemuri on the current library · done (Inemuri v4.61.0)
 
 Goal: a working source inside Inemuri with no change in transport yet.
+
+**How it was done, and where it differs from the plan below:**
+
+- Built as planned: `DiscordSelfSource` (Inemuri
+  `src/sources/discord/DiscordSelfSource.js`) forks
+  `transport/selfbotChild.js` with `--max-old-space-size`
+  (`DISCORD_SOURCE_HEAP_MB`, 256) and restarts only the child on RSS above
+  `DISCORD_SOURCE_MAX_RSS_MB` (450), on a crash (30 s doubling to 15 min) —
+  never on a refused token. The cache limits of v1.6.1 are carried over
+  unchanged. The token is passed over IPC, not in argv.
+- IPC messages as planned, minus `history` (not built yet); the child also
+  sends `stats` (the `[MEMSTAT]` successor, logged as `[DISCORD] stats`) and
+  `log`.
+- **The configuration was not migrated.** The operator describes the
+  channels anew in Inemuri's `sources.json`; `guild_whitelist.json`, the
+  `Channel` table and the webhooks are not reused.
+- **Delivery is Inemuri's bot to channel ids**, not webhooks.
+- **No shadow comparison:** CloakCord was already off, so the exit criterion
+  "same `seen` / `matched` as CloakCord" was dropped. What replaces it: a day
+  or two of `[DISCORD] stats` with flat RSS and `matched` > 0.
+- Fixed on the way: matching covers embed text (ISSUES O6); videos and embed
+  images are forwarded (O7).
+
+The original plan, for reference:
 
 - `DiscordSelfSource` extends `BaseSourceAdapter` and runs the transport in a
   **supervised child process** (`child_process.fork`) with its own
@@ -132,7 +166,9 @@ running.
 
 ## Open questions
 
-- Whether `MESSAGE_UPDATE` is needed (ISSUES O8) — decide at step 2.
-- Which attachment and embed types should be forwarded (ISSUES O7).
+- Whether `MESSAGE_UPDATE` is needed (ISSUES O8) — not handled at step 2;
+  still open.
+- ~~Which attachment and embed types should be forwarded (ISSUES O7).~~
+  Decided at step 2: images and videos (attachments and embed images), up to 4.
 - Whether history scans are triggered manually (CLI command) or on a
   schedule (cron); manual first is the safer default.

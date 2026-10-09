@@ -1,7 +1,9 @@
 # Known issues
 
 Register of every known problem in CloakCord, fixed and open. Last review:
-2026-10-08 (v1.6.3). The memory investigation has its own document,
+2026-10-09 (v1.6.4) — after the move into Inemuri (v4.61.0, NEXT_STEPS step
+2). CloakCord is switched off; the open items below now concern the Inemuri
+source (`src/sources/discord/`, `docs/DISCORD_SOURCE.md` there). The memory investigation has its own document,
 [MEMORY.md](MEMORY.md); the plan for what comes next is in
 [NEXT_STEPS.md](NEXT_STEPS.md).
 
@@ -24,23 +26,31 @@ cases, or a trap for the next change), **low** (cleanup).
 | F9 | high | **Empty filter forwarded nothing.** The default filter `[""]` meant "forward everything" up to v1.5.3 (`includes("")` is true); v1.6.0 and v1.6.1 dropped empty keywords. 9 of 76 channels were affected. | 1.6.3 |
 | F10 | medium | **No way to tell "channel unreachable" from "no keyword match".** `[MEMSTAT]` now shows `watched=visible/total` and `seen` (messages from watched channels before keyword filtering). | 1.6.3 |
 | F11 | critical | **Heap snapshots with secrets on disk.** Five snapshots (~1.1 GB) held the account token and webhook tokens. Git-ignored, never committed. Deleted 2026-10-03 after analysis. | — |
+| F12 | high | **Text inside embeds was never matched** (was O6). Only `message.content` was checked; bots and announcement feeds post an empty `content` with the text in `embeds`. Matching now covers content plus embed title, description and fields. | Inemuri v4.61.0 |
+| F13 | medium | **Only image attachments were forwarded** (was O7). Videos and embed images are forwarded now (up to 4); documents and stickers are not, by decision. | Inemuri v4.61.0 |
+| F14 | low | **README token instructions** (was O15) were not carried into the public Inemuri repo; there the token is only `DISCORD_USER_TOKEN` in `.env`. | Inemuri v4.61.0 |
 
 ## Open
 
 | # | Severity | Problem | Notes / next action |
 |---|---|---|---|
-| O1 | critical | **The library is dead.** `discord.js-selfbot-v13`: GitHub repository archived (last push 2025-10-11), npm package deprecated, latest 3.7.1 (we use 3.7.0). No upstream fixes when Discord changes the user-client protocol. | Replace with an own minimal client: [NEXT_STEPS.md](NEXT_STEPS.md). Do not fork it (see O2). |
-| O2 | high | **License: GPL-3.0.** The library is GPL-3.0; Inemuri is MIT and public. A modified fork vendored into Inemuri would put Inemuri under GPL. | The own client is written from protocol knowledge, not from copied library code. |
-| O3 | critical | **Discord ToS.** Automating a user account ("self-bot") is against Discord's terms; the account can be banned without warning. | Use a dedicated secondary account, read-only. Never send from it — delivery stays on webhooks. Keep history scans slow (see NEXT_STEPS). |
-| O4 | high | **Forwarding not yet confirmed after v1.6.3.** The 19 h run of v1.6.1 showed `matched=0 sent=0`. F9 explains the 9 forward-all channels; the 67 keyword channels are unexplained. | Run 1.6.3 and read `watched` / `seen` (see MEMORY.md, "Follow-up"). |
-| O5 | high | **Stale channel list.** The account went from 107 to 92 guilds; the database references 70 guilds. Some configured channels may be unreachable. | `watched=X/76` will show how many. Remove or replace the dead rows. |
-| O6 | high | **Text inside embeds is never matched.** Only `message.content` is checked. Bots and announcement feeds often post an empty `content` with the text in `embeds` (title, description, fields). Such messages are skipped as "no content" unless they have an image attachment. Possible cause of O4. | If `seen` grows but `matched` stays 0, check whether the sources post embeds. Matching should cover embed title, description and fields. |
-| O7 | medium | **Only image attachments are forwarded.** Other files (video, documents) are dropped; source embeds and stickers are not forwarded either. | Decide what is needed when moving into Inemuri (its media resolver already handles this). |
-| O8 | medium | **Edits and deletes are ignored.** `MESSAGE_UPDATE` is not handled, so a post that gets its keyword in an edit is never forwarded. No dedup either. | Inemuri's dedup and TheFlow cover this after the move. |
-| O9 | medium | **Restart path reuses a destroyed client.** `index.js` `handleRestart()` calls `DiscordUser.shutdown()` (`client.destroy()`) and then `main()` again on the same `Client` instance. Untested; may fail to log in again. | In practice pm2 restarts the process. Make the restart path exit and let pm2 restart, or create a new client. |
-| O10 | medium | **`upload.js` calls `notify` without importing it**, so a DB error during upload throws `ReferenceError`. It also only upserts: channels removed from `guild_whitelist.json` stay in the database. | Fix if `upload.js` stays; moot after the move (Inemuri seeds from `sources.json`). |
-| O11 | low | **Unused fields and config.** `blacklist`, `replace`, `add_content`, `target_telegram`, `target_line`, `type` are stored but never used; `DISCORD_*_CHANNEL_WEBHOOK` env vars and an empty `src/modules/telegram/telegram.js` are leftovers; `sequelize-cli` is an unused dependency. | Drop during the move; map only the fields that are used. |
-| O12 | low | **`sequelize.sync()` on every start, no migrations.** Harmless for one small table, but a schema change has no safe path. | Moot after the move (Inemuri has migrations). |
-| O13 | low | **No tests, no lint.** The only checks are the offline smoke test used for 1.6.1/1.6.3. | The own client is built with `node --test` suites from the start (pure core). |
-| O14 | low | **Notifications swallow errors.** `notify()` logs and continues; a broken Telegram token goes unnoticed except in logs. | Acceptable for alerts; Inemuri has its own delivery health. |
-| O15 | low | **README token instructions.** README shows how to extract a user token from the browser console. Fine for a private repo; do not carry it into the public Inemuri repo. | Document the token as an `.env` secret only. |
+| O1 | critical | **The library is dead.** `discord.js-selfbot-v13`: GitHub repository archived (last push 2025-10-11), npm package deprecated, latest 3.7.1 (Inemuri pins 3.7.0 exactly). No upstream fixes when Discord changes the user-client protocol. | Now isolated in Inemuri's child process. Replace with an own minimal client: [NEXT_STEPS.md](NEXT_STEPS.md) step 3. Do not fork it (see O2). |
+| O2 | high | **License: GPL-3.0.** The library is GPL-3.0; Inemuri is MIT and public. A modified fork vendored into Inemuri would put Inemuri under GPL. | Inemuri uses it as an npm dependency only, nothing copied or modified. The own client is written from protocol knowledge. |
+| O3 | critical | **Discord ToS.** Automating a user account ("self-bot") is against Discord's terms; the account can be banned without warning. | Use a dedicated secondary account, read-only. Never send from it — delivery is Inemuri's bot. Keep history scans slow (see NEXT_STEPS). |
+| O8 | medium | **Edits and deletes are ignored.** `MESSAGE_UPDATE` is not handled, so a post that gets its keyword in an edit is never forwarded. | Still true in Inemuri v4.61.0. TheFlow's dedup covers repeats for flow-enabled channels. |
+| O16 | medium | **Not yet run against Discord.** The Inemuri source passed unit tests with a fake child and a real child with an empty token, nothing live. Forwarding was never confirmed in CloakCord either (was O4). | First live run in Inemuri: `[DISCORD] stats` with flat RSS, `members` ≤ ~2 per server, `watched` = total, `matched` > 0. |
+
+## Closed by the move into Inemuri
+
+Problems of CloakCord's own code and data, which Inemuri does not carry over.
+
+| # | Problem | Why closed |
+|---|---|---|
+| O4 | Forwarding not confirmed after v1.6.3 | CloakCord is off; confirming moves to the Inemuri source (O16) |
+| O5 | Stale channel list (107 → 92 guilds, 70 referenced) | The list is not migrated; channels are described anew. Inemuri lists invisible channels by name at startup |
+| O9 | Restart path reuses a destroyed client | Inemuri restarts the whole child process, a new client each time |
+| O10 | `upload.js` bugs, stale rows | Inemuri seeds from `sources.json` |
+| O11 | Unused fields and config | Only channel id, name, keywords and destinations are used in Inemuri |
+| O12 | `sequelize.sync()`, no migrations | Inemuri has migrations; the `discord` platform needed none |
+| O13 | No tests, no lint | Inemuri's source has `node --test` suites for its pure core and the supervisor, and is linted in CI |
+| O14 | Notifications swallow errors | Inemuri's logging, health and status board apply |
