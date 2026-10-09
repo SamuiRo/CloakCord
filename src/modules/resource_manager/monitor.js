@@ -23,8 +23,14 @@ const mb = (bytes) => (bytes / 1048576).toFixed(1);
 function collect() {
     // Лінивий require: монітор стартує раніше за Discord-клієнт
     const DiscordUser = require("../discord/discord-user");
-    const { getStats } = require("../discord/events/index");
+    const { getStats, getWatchedChannelIds } = require("../discord/events/index");
     const memory = process.memoryUsage();
+
+    // Скільки налаштованих каналів акаунт реально бачить. Менше за total —
+    // акаунт вийшов із сервера або втратив доступ до каналу.
+    const watchedIds = getWatchedChannelIds();
+    const channelsCache = DiscordUser.getClient().channels.cache;
+    const visible = watchedIds.filter(id => channelsCache.has(id)).length;
 
     return {
         uptimeMin: ((Date.now() - startTime) / 60000).toFixed(0),
@@ -35,6 +41,7 @@ function collect() {
         cache: DiscordUser.getCacheStats(),
         events: DiscordUser.getEventCounters(),
         messages: getStats(),
+        watched: `${visible}/${watchedIds.length}`,
     };
 }
 
@@ -42,7 +49,7 @@ function format(s) {
     const c = s.cache;
     return `uptime=${s.uptimeMin}m rss=${s.rss}MB heap=${s.heapUsed}MB ext=${s.external}MB | ` +
         `guilds=${c.guilds} channels=${c.channels} members=${c.members} users=${c.users} msgs=${c.messages} | ` +
-        `events=${s.events.messageCreate} matched=${s.messages.matched} sent=${s.messages.sent} errors=${s.messages.errors + s.events.error}`;
+        `events=${s.events.messageCreate} watched=${s.watched} seen=${s.messages.seen} matched=${s.messages.matched} sent=${s.messages.sent} errors=${s.messages.errors + s.events.error}`;
 }
 
 async function logStat() {

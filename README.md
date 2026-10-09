@@ -31,6 +31,12 @@ Memory growth was caused by unbounded member and user caches in the library
 Investigation, fix and verification procedure: [docs/MEMORY.md](docs/MEMORY.md).
 The monitor logs a `[MEMSTAT]` line every 10 minutes.
 
+## Status and plan
+
+- [docs/ISSUES.md](docs/ISSUES.md) — every known problem, fixed and open.
+- [docs/NEXT_STEPS.md](docs/NEXT_STEPS.md) — moving into Inemuri as a source,
+  then replacing the archived library with an own minimal client.
+
 ## Get Token ?
 
 Run code (Discord Console - [Ctrl + Shift + I])

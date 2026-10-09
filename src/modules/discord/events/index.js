@@ -1,7 +1,8 @@
-const { init_channels, on_message_create, getStats } = require("./create-message");
+const { init_channels, on_message_create, getStats, getWatchedChannelIds } = require("./create-message");
 
 module.exports = {
   init_channels,
   on_message_create,
   getStats,
+  getWatchedChannelIds,
 };

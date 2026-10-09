@@ -9,7 +9,9 @@ const CHANNELS_REFRESH_INTERVAL = 300000 // 5 хвилин
 let channels = new Map()
 let refreshTimer = null
 
-let stats = { matched: 0, sent: 0, errors: 0 }
+// seen — повідомлення з відстежуваних каналів (до фільтра ключових слів).
+// seen=0 при живих events означає, що канали недоступні акаунту, а не що фільтр суворий.
+let stats = { seen: 0, matched: 0, sent: 0, errors: 0 }
 
 async function load_channels() {
     // Без raw: true — інакше SQLite віддає JSON-колонки (filter, target_discord) рядком
@@ -87,8 +89,13 @@ async function on_message_create(message) {
     const hasAttachments = message.attachments?.size > 0
     if (!content.trim() && !hasAttachments) return
 
+    stats.seen++
+
+    // Порожній фільтр (за замовчуванням [""]) означає «пересилати все» —
+    // так працювало до v1.6.0, де includes("") завжди давав true.
     const contentLower = content.toLowerCase()
-    if (!channel.keywords.some(k => contentLower.includes(k))) return
+    const forwardAll = channel.keywords.length === 0
+    if (!forwardAll && !channel.keywords.some(k => contentLower.includes(k))) return
 
     stats.matched++
     console.log(`[MESSAGE] Match in ${channel.guild_name} (${message.channelId}), targets: ${channel.target_discord.length}`)
@@ -110,8 +117,13 @@ function getStats() {
     return { channels: channels.size, ...stats }
 }
 
+function getWatchedChannelIds() {
+    return [...channels.keys()]
+}
+
 module.exports = {
     init_channels,
     on_message_create,
-    getStats
+    getStats,
+    getWatchedChannelIds
 }

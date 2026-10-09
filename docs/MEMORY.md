@@ -1,7 +1,7 @@
 # Memory growth: investigation and fix
 
-Status as of v1.6.1 (2026-10-03): root cause identified and fixed in code,
-**not yet confirmed in production**. This document records what was found,
+Status as of v1.6.3 (2026-10-04): root cause fixed in v1.6.1 and
+**confirmed in production** (19 h flat RSS, see the verification log). This document records what was found,
 what was changed, and how to verify it. Update the "Verification log" section
 with the outcome.
 
@@ -119,7 +119,7 @@ pm2 start index.js --name cloakcord
 Every 10 minutes the monitor logs one line:
 
 ```
-[MEMSTAT] uptime=120m rss=210.4MB heap=150.2MB ext=3.1MB | guilds=107 channels=15188 members=214 users=2 msgs=0 | events=8123 matched=14 sent=14 errors=0
+[MEMSTAT] uptime=120m rss=210.4MB heap=150.2MB ext=3.1MB | guilds=107 channels=15188 members=214 users=2 msgs=0 | events=8123 watched=74/76 seen=310 matched=14 sent=14 errors=0
 ```
 
 Collect it with:
@@ -139,7 +139,7 @@ Expected values:
 | `users` | 1–2, flat |
 | `msgs` | 0 |
 | `rss` | rises during the first hour (READY payload, JIT, V8 heap sizing), then a plateau |
-| `sent` | grows with `matched` (forwarding works) |
+| `watched` | close to total; `seen` grows; `sent` grows with `matched` (forwarding works) |
 
 **Success:** `rss` stays on a plateau for 24–48 h while caches stay small.
 
@@ -170,4 +170,24 @@ interface.
 
 | Date | Version | Duration | RSS start -> end | Caches | Result |
 |---|---|---|---|---|---|
-| | 1.6.1 | | | | |
+| 2026-10-03 05:00 – 10-04 00:00 | 1.6.1 | 19 h, no pm2 limit, 92 guilds, ~205k events | 249 -> 250 MB for 15 h, then 203–209 MB | heap 65–72 MB flat; members 164–180 (bound 2 × 92); users 2; msgs 0 | **Leak fixed.** Forwarding not verified: `matched=0` (see below) |
+
+For comparison, the old monitor (pre-1.6.0, June 2026) reported heap used
+70 MB at start, 116 MB after 65 min and 245 MB after 465 min. The old
+percentage metric was meaningless, but the absolute heap values are
+comparable: steady growth then, flat now.
+
+### Follow-up: `matched=0` in the 1.6.1 run (fixed in 1.6.3)
+
+- 9 of 76 channels have the default filter `[""]`. Up to v1.5.3,
+  `content.includes("")` was always true, so an empty filter meant "forward
+  everything". v1.6.0 and v1.6.1 dropped empty keywords and never matched
+  these channels. v1.6.3 restores "empty filter = forward all".
+- `[MEMSTAT]` now also shows `watched=visible/total` (configured channels
+  present in the client cache) and `seen` (messages from watched channels,
+  before keyword filtering). Reading them:
+  - `seen=0` with `watched` well below total: the account left those guilds
+    or lost access (the account went from 107 to 92 guilds; the database
+    references 70 guilds).
+  - `seen>0`, `matched=0` on the keyword channels: the keywords simply did
+    not occur.
